@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import 'bulma/css/bulma.css';
 import './App.scss';
 
@@ -16,35 +16,72 @@ export const goodsFromServer = [
 ];
 
 export const App: React.FC = () => {
+  const [goods, setGoods] = useState(goodsFromServer);
+  const [activeAction, setActiveAction] = useState<string | null>(null);
+
+  const handleSortAlphabetically = () => {
+    const sortedGoods = [...goods].sort((a, b) => a.localeCompare(b));
+    setGoods(sortedGoods);
+    setActiveAction('alphabetical');
+  };
+
+  const handleSortByLength = () => {
+    const sortedGoods = [...goods].sort((a, b) => a.length - b.length);
+    setGoods(sortedGoods);
+    setActiveAction('length');
+  };
+
+  const handleReverse = () => {
+    const reversedGoods = [...goods].reverse();
+    setGoods(reversedGoods);
+    setActiveAction('reverse');
+  };
+
+  const handleReset = () => {
+    setGoods(goodsFromServer);
+    setActiveAction(null);
+  };
+
   return (
     <div className="section content">
       <div className="buttons">
-        <button type="button" className="button is-info is-light">
+        <button
+          className={`button is-info ${activeAction === 'alphabetical' ? 'is-active' : 'is-light'}`}
+          onClick={handleSortAlphabetically}
+        >
           Sort alphabetically
         </button>
 
-        <button type="button" className="button is-success is-light">
+        <button
+          className={`button is-success ${activeAction === 'length' ? 'is-active' : 'is-light'}`}
+          onClick={handleSortByLength}
+        >
           Sort by length
         </button>
 
-        <button type="button" className="button is-warning is-light">
+        <button
+          className={`button is-warning ${activeAction === 'reverse' ? 'is-active' : 'is-light'}`}
+          onClick={handleReverse}
+        >
           Reverse
         </button>
 
-        <button type="button" className="button is-danger is-light">
-          Reset
-        </button>
+        {activeAction && (
+          <button
+            className="button is-danger is-light"
+            onClick={handleReset}
+          >
+            Reset
+          </button>
+        )}
       </div>
 
       <ul>
-        <ul>
-          <li data-cy="Good">Dumplings</li>
-          <li data-cy="Good">Carrot</li>
-          <li data-cy="Good">Eggs</li>
-          <li data-cy="Good">Ice cream</li>
-          <li data-cy="Good">Apple</li>
-          <li data-cy="Good">...</li>
-        </ul>
+        {goods.map((item) => (
+          <li key={item} data-cy="Good">
+            {item}
+          </li>
+        ))}
       </ul>
     </div>
   );
